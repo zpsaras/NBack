@@ -9,11 +9,13 @@ public class NBack2016 : MonoBehaviour {
 	public int deckSize;
 	public int numberOfLures;
 
-	public Text zeroBackTargetText;
+	public GameObject zeroBackTargetPanel;
 	public GameObject titlePanel;
 	public Text currentLetterText;
 	public Text fKeyText;
 	public Text jKeyText;
+
+	public Animator animator;
 
 	private Letter[] zeroBackLetters;
 	private Letter[] oneBackLetters;
@@ -77,7 +79,7 @@ public class NBack2016 : MonoBehaviour {
 
 	IEnumerator startZeroBack() {
 		// Set hint
-		zeroBackTargetText.text = zeroBackTarget.ToString();
+		zeroBackTargetPanel.GetComponentInChildren<Text>().text = zeroBackTarget.ToString();
 		titlePanel.GetComponentInChildren<Text>().text = "0-Back";
 		int curr = 0;
 		bool refresh = true;
@@ -106,7 +108,37 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
-		printLetterArray(zeroBackLetters); // DEBUG
+		StartCoroutine (startOneBack ());
+	}
+
+	IEnumerator startOneBack() {
+		zeroBackTargetPanel.SetActive (false);
+		titlePanel.GetComponentInChildren<Text> ().text = "1-Back";
+		int curr = 0;
+		bool refresh = true;
+
+		while (!oneBackFinished) {
+			if (refresh) {
+				currentLetterText.text = oneBackLetters [curr].getChar ().ToString ();
+				refresh = false;
+			}
+			bool f = Input.GetKeyDown (KeyCode.F);
+			bool j = Input.GetKeyDown (KeyCode.J);
+			if (f || j) {
+				if (curr < oneBackLetters.Length - 1) {
+					if (keyHandler (f, j)) {
+						oneBackLetters [curr].setResponse (Letter.resp.match);
+					} else {
+						zeroBackLetters [curr].setResponse (Letter.resp.noMatch);
+					}
+					curr++;
+					refresh = true;
+				} else {
+					oneBackFinished = true;
+				}
+			}
+			yield return null;
+		}
 	}
 
 	void setUpZeroBack() {
@@ -278,6 +310,21 @@ class Letter {
 		this.target = targ;
 		this.lure = lure;
 		this.response = resp.noResp;
+	}
+
+	public override bool Equals (object obj)
+	{
+		//return base.Equals (obj);
+		if (obj == null) {
+			return false;
+		}
+
+		Letter l = obj as Letter;
+		if ((object)l == null) {
+			return false;
+		}
+
+		return ((l.lure == this.lure) && (l.target == this.target) && (l.character == this.character) && (l.response == this.response));
 	}
 
 	public resp getResponse() {
