@@ -53,8 +53,9 @@ public class NBack2016 : MonoBehaviour {
 
 		// Set up 1-back
 		setUpOneBack();
-		printLetterArray(oneBackLetters);
-		twoBackLetters		= new Letter[deckSize + 2];
+
+		// Set up 2-back
+		setUpTwoBack();
 		threeBackLetters	= new Letter[deckSize + 3];
 
 		StartCoroutine(startZeroBack());
@@ -86,6 +87,10 @@ public class NBack2016 : MonoBehaviour {
 
 		while (!zeroBackFinished) {
 			// Task logic here
+			if (curr == zeroBackLetters.Length) {
+				zeroBackFinished = true;
+				break;
+			}
 			if (refresh) {
 				// UI Update Logic
 				currentLetterText.text = zeroBackLetters[curr].getChar().ToString();
@@ -95,7 +100,7 @@ public class NBack2016 : MonoBehaviour {
 			bool f = Input.GetKeyDown(KeyCode.F);
 			bool j = Input.GetKeyDown(KeyCode.J);
 			if (f || j) {
-				if (curr < zeroBackLetters.Length - 1) {
+				if (curr < zeroBackLetters.Length) {
 					if (keyHandler(f, j)) {
 						zeroBackLetters[curr].setResponse(Letter.resp.match);
 					} else {
@@ -108,6 +113,7 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
+		printLetterArray(zeroBackLetters);
 		StartCoroutine (startOneBack ());
 	}
 
@@ -118,6 +124,11 @@ public class NBack2016 : MonoBehaviour {
 		bool refresh = true;
 
 		while (!oneBackFinished) {
+
+			if (curr == oneBackLetters.Length) {
+				oneBackFinished = true;
+				break;
+			}
 			if (refresh) {
 				currentLetterText.text = oneBackLetters [curr].getChar ().ToString ();
 				refresh = false;
@@ -125,20 +136,59 @@ public class NBack2016 : MonoBehaviour {
 			bool f = Input.GetKeyDown (KeyCode.F);
 			bool j = Input.GetKeyDown (KeyCode.J);
 			if (f || j) {
-				if (curr < oneBackLetters.Length - 1) {
+				if (curr < oneBackLetters.Length) {
 					if (keyHandler (f, j)) {
 						oneBackLetters [curr].setResponse (Letter.resp.match);
 					} else {
-						zeroBackLetters [curr].setResponse (Letter.resp.noMatch);
+						oneBackLetters [curr].setResponse (Letter.resp.noMatch);
 					}
 					curr++;
 					refresh = true;
 				} else {
 					oneBackFinished = true;
+					break;
 				}
 			}
 			yield return null;
 		}
+		printLetterArray(oneBackLetters);
+		StartCoroutine(startTwoBack());
+	}
+
+	IEnumerator startTwoBack() {
+		zeroBackTargetPanel.SetActive(false);
+		titlePanel.GetComponentInChildren<Text>().text = "2-Back";
+		int curr = 0;
+		bool refresh = true;
+
+		while (!twoBackFinished) {
+			if (curr == twoBackLetters.Length) {
+				twoBackFinished = true;
+				break;
+			}
+			if (refresh) {
+				currentLetterText.text = twoBackLetters[curr].getChar().ToString();
+				refresh = false;
+			}
+			bool f = Input.GetKeyDown(KeyCode.F);
+			bool j = Input.GetKeyDown(KeyCode.J);
+			if (f || j) {
+				if (curr < twoBackLetters.Length) {
+					if (keyHandler(f, j)) {
+						twoBackLetters[curr].setResponse(Letter.resp.match);
+					} else {
+						twoBackLetters[curr].setResponse(Letter.resp.noMatch);
+					}
+					curr++;
+					refresh = true;
+				} else {
+					twoBackFinished = true;
+					break;
+				}
+			}
+			yield return null;
+		}
+		printLetterArray(twoBackLetters);
 	}
 
 	void setUpZeroBack() {
@@ -261,7 +311,121 @@ public class NBack2016 : MonoBehaviour {
 						}
 					}
 				}
-				Debug.Log("Added new letter in pos: [" + i + "] with value: " + oneBackLetters[i].getChar());
+				//Debug.Log("Added new letter in pos: [" + i + "] with value: " + oneBackLetters[i].getChar());
+			}
+		}
+	}
+
+	// Lure bug?
+	void setUpTwoBack() {
+		int i, j, rand, luresLeft = numberOfLures;
+		char hold;
+		bool flag = false;
+		twoBackLetters		= new Letter[deckSize + 2];
+		System.Random rng	= new System.Random();
+		twoBackFinished		= false;
+
+		char[] tempTargetArray = createTargetArray(rng);
+		int[] targetLocations = new int[numberOfTargets];
+
+		// Fill targets
+		i = 0;
+		while (i < numberOfTargets) {
+			j = rng.Next(0, twoBackLetters.Length - 2);
+			if ((twoBackLetters[j] == null) && (twoBackLetters[j + 2] == null)) {
+				twoBackLetters[j] = new Letter(tempTargetArray[i], false, false);
+				twoBackLetters[j + 2] = new Letter(tempTargetArray[i], true, false);
+				targetLocations[i] = j + 2;
+
+				// Perhaps add a lures idk
+				if (luresLeft > 0) {
+
+					// j+2 is target location
+					rand = rng.Next(0, 2);
+					if (rand == 0) {
+						// Insert @ targetLocation - 3
+						if (j - 1 >= 0) {
+							if (twoBackLetters[j - 1] == null) {
+								twoBackLetters[j - 1] = new Letter(tempTargetArray[i], false, true);
+								luresLeft--;
+							} else {
+								rand = 1;
+							}
+						} else {
+							rand = 1;
+						}
+					} 
+					if (rand == 1) {
+						// Insert @ targetLocation - 1
+						if (twoBackLetters[j + 1] == null) {
+							twoBackLetters[j + 1] = new Letter(tempTargetArray[i], false, true);
+							luresLeft--;
+						} // Never cycles around?
+					}
+
+					luresLeft--;
+				}
+
+				i++;
+			} else {
+				continue;
+			}
+		}
+
+			// Initialize rest
+			for (i = 0; i < twoBackLetters.Length; i++) {
+				if (twoBackLetters[i] == null) {
+					twoBackLetters[i] = new Letter('?', false, false);
+				}
+			}
+
+		// Fill random while protecting against accidental targets & lures
+		for (i = 0; i < twoBackLetters.Length; i++) {
+			flag = false;
+			if (twoBackLetters[i].getChar() == '?') {
+				// Empty slot for insertion
+				while (!flag) {
+					hold = (char)rng.Next(65, 90);
+					// Ensure that we aren't accidentally inserting what would be a target
+					// I know it's sloppy and I'm moderately sorry
+					if (i == 0 || i == 1) {
+						if ((twoBackLetters[i + 2].getChar() == hold)) {
+							// NO-K
+							continue;
+						} else {
+							twoBackLetters[i] = new Letter(hold, false, false);
+							flag = true;
+							continue;
+						}
+					}
+					if (i > 0 && i < (twoBackLetters.Length - 2)) {
+						Debug.Log(i);
+						if ((twoBackLetters[i - 2].getChar() == hold) ||
+							(twoBackLetters[i + 2].getChar() == hold)) {
+							// This is NO-K
+							continue;
+						} else {
+							twoBackLetters[i] = new Letter(hold, false, false);
+							flag = true;
+						}
+					} else if (i == 0) {
+						if (twoBackLetters[i + 2].getChar() == hold) {
+							// NO-K
+							continue;
+						} else {
+							twoBackLetters[i] = new Letter(hold, false, false);
+							flag = true;
+						}
+					} else if (i >= (twoBackLetters.Length - 2)) {
+						if (twoBackLetters[i - 2].getChar() == hold) {
+							//NO-K
+							continue;
+						} else {
+							twoBackLetters[i] = new Letter(hold, false, false);
+							flag = true;
+						}
+					}
+				}
 			}
 		}
 	}
