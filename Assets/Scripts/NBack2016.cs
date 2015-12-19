@@ -15,6 +15,7 @@ public class NBack2016 : MonoBehaviour {
 
 	public GameObject zeroBackTargetPanel;
 	public GameObject titlePanel;
+	public GameObject intermissionPanel;
 	public Text currentLetterText;
 	public Text fKeyText;
 	public Text jKeyText;
@@ -58,13 +59,31 @@ public class NBack2016 : MonoBehaviour {
 
 		setUpThreeBack();
 
-		StartCoroutine(taskIntermission(startZeroBack()));
+		StartCoroutine(taskIntermission(0));
 	}
 
-	IEnumerator taskIntermission(IEnumerator nextPhase) {
+	IEnumerator taskIntermission(uint n) {
 		float count = countdownLength + 1;
 		float timeHold = Time.time;
 		titlePanel.GetComponentInChildren<Text> ().text = "Twilight Phase";
+		switch (n) {
+			case 0:
+				intermissionPanel.GetComponentInChildren<Text>().text = "The next phase will be 0-Back";
+				break;
+			case 1:
+				intermissionPanel.GetComponentInChildren<Text>().text = "The next phase will be 1-Back";
+				break;
+			case 2:
+				intermissionPanel.GetComponentInChildren<Text>().text = "The next phase will be 2-Back";
+				break;
+			case 3:
+				intermissionPanel.GetComponentInChildren<Text>().text = "The next phase will be 3-Back";
+				break;
+			default:
+				intermissionPanel.GetComponentInChildren<Text>().text = "INTERMISSION ERROR";
+				break;
+		}
+		intermissionPanel.SetActive(true);
 		currentLetterText.text = count.ToString ();
 		countdownToneSource.Play ();
 		zeroBackTargetPanel.SetActive (false);
@@ -81,7 +100,24 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return new WaitForEndOfFrame ();
 		}
-		StartCoroutine (nextPhase);
+		intermissionPanel.SetActive(false);
+		switch (n) {
+			case 0:
+				StartCoroutine(startZeroBack());
+				break;
+			case 1:
+				StartCoroutine(startOneBack());
+				break;
+			case 2:
+				StartCoroutine(startTwoBack());
+				break;
+			case 3:
+				StartCoroutine(startThreeBack());
+				break;
+			default:
+				Debug.LogError("UInt passed to taskIntermission does not correspond to a phase. (n=" + n + ")");
+				break;
+		}
 	}
 
 
@@ -135,7 +171,7 @@ public class NBack2016 : MonoBehaviour {
 			yield return null;
 		}
 		printLetterArray(zeroBackLetters);
-		StartCoroutine (taskIntermission(startOneBack()));
+		StartCoroutine (taskIntermission(1));
 	}
 
 	IEnumerator startOneBack() {
@@ -173,7 +209,7 @@ public class NBack2016 : MonoBehaviour {
 			yield return null;
 		}
 		printLetterArray(oneBackLetters);
-		StartCoroutine(taskIntermission(startTwoBack()));
+		StartCoroutine(taskIntermission(2));
 	}
 
 	IEnumerator startTwoBack() {
@@ -210,7 +246,7 @@ public class NBack2016 : MonoBehaviour {
 			yield return null;
 		}
 		printLetterArray(twoBackLetters);
-		StartCoroutine (taskIntermission(startThreeBack()));
+		StartCoroutine (taskIntermission(3));
 	}
 
 	IEnumerator startThreeBack() {
@@ -247,6 +283,13 @@ public class NBack2016 : MonoBehaviour {
 			yield return null;
 		}
 		printLetterArray(threeBackLetters);
+		endTask();
+	}
+
+	public void endTask() {
+		if (Application.CanStreamedLevelBeLoaded("Fin")) {
+			UnityEngine.SceneManagement.SceneManager.LoadScene("Fin");
+		}
 	}
 
 	void setUpZeroBack() {
