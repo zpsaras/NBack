@@ -141,6 +141,7 @@ public class NBack2016 : MonoBehaviour {
 		titlePanel.GetComponentInChildren<Text>().text = "0-Back";
 		int curr = 0;
 		bool refresh = true;
+        float timer = Time.time;
 
 		while (!zeroBackFinished) {
 			// Task logic here
@@ -163,7 +164,9 @@ public class NBack2016 : MonoBehaviour {
 					} else {
 						zeroBackLetters[curr].setResponse(Letter.resp.noMatch);
 					}
-					curr++; refresh = true;
+                    zeroBackLetters[curr].SetResponseTime(Time.time - timer);
+                    timer = Time.time;
+                    curr++; refresh = true;
 				} else {
 					zeroBackFinished = true;
 				}
@@ -179,6 +182,7 @@ public class NBack2016 : MonoBehaviour {
 		titlePanel.GetComponentInChildren<Text> ().text = "1-Back";
 		int curr = 0;
 		bool refresh = true;
+        float timer = Time.time;
 
 		while (!oneBackFinished) {
 
@@ -199,7 +203,9 @@ public class NBack2016 : MonoBehaviour {
 					} else {
 						oneBackLetters [curr].setResponse (Letter.resp.noMatch);
 					}
-					curr++;
+                    oneBackLetters[curr].SetResponseTime(Time.time - timer);
+                    timer = Time.time;
+                    curr++;
 					refresh = true;
 				} else {
 					oneBackFinished = true;
@@ -217,6 +223,7 @@ public class NBack2016 : MonoBehaviour {
 		titlePanel.GetComponentInChildren<Text>().text = "2-Back";
 		int curr = 0;
 		bool refresh = true;
+        float timer = Time.time;
 
 		while (!twoBackFinished) {
 			if (curr == twoBackLetters.Length) {
@@ -236,7 +243,9 @@ public class NBack2016 : MonoBehaviour {
 					} else {
 						twoBackLetters[curr].setResponse(Letter.resp.noMatch);
 					}
-					curr++;
+                    oneBackLetters[curr].SetResponseTime(Time.time - timer);
+                    timer = Time.time;
+                    curr++;
 					refresh = true;
 				} else {
 					twoBackFinished = true;
@@ -254,6 +263,7 @@ public class NBack2016 : MonoBehaviour {
 		titlePanel.GetComponentInChildren<Text>().text = "3-Back";
 		int curr = 0;
 		bool refresh = true;
+        float timer = Time.time;
 
 		while (!threeBackFinished) {
 			if (curr == threeBackLetters.Length) {
@@ -273,6 +283,8 @@ public class NBack2016 : MonoBehaviour {
 					} else {
 						threeBackLetters[curr].setResponse(Letter.resp.noMatch);
 					}
+                    threeBackLetters[curr].SetResponseTime(Time.time - timer);
+                    timer = Time.time;
 					curr++;
 					refresh = true;
 				} else {
@@ -287,12 +299,22 @@ public class NBack2016 : MonoBehaviour {
 	}
 
 	public void endTask() {
+        compileData(zeroBackLetters, oneBackLetters, twoBackLetters, threeBackLetters);
 		if (Application.CanStreamedLevelBeLoaded("Fin")) {
 			UnityEngine.SceneManagement.SceneManager.LoadScene("Fin");
 		}
 	}
 
-	void setUpZeroBack() {
+    public void compileData(Letter[] zeba, Letter[] onba, Letter[] toba, Letter[] teba)
+    {
+        Debug.Log("Compiling data...");
+        JSONObject j = JSONWriter.BuildJSON(zeba,onba,toba,teba);
+        string jsonString = j.Print() + ";";
+        byte[] enc = easy.Crypto.encrypt(jsonString, "7SpBUI73CFK03iUBY8G2dX3eTXd1AU92");
+        Application.ExternalCall("setAndDisplayEnc", System.Convert.ToBase64String(enc));
+    }
+
+    void setUpZeroBack() {
 		int i;
 		zeroBackLetters			= new Letter[deckSize];
 		System.Random rng		= new System.Random();
@@ -675,7 +697,7 @@ public class NBack2016 : MonoBehaviour {
 	}
 }
 
-class Letter {
+public class Letter {
 	public enum resp {
 		match,
 		noMatch,
@@ -684,6 +706,7 @@ class Letter {
 	private bool lure, target;
 	private char character;
 	private resp response;
+    private float responseTime;
 
 	public Letter(char c, bool targ, bool lure) {
 		this.character = c;
@@ -723,6 +746,11 @@ class Letter {
 		this.character = c;
 	}
 
+    public float GetResponseTime()
+    {
+        return this.responseTime;
+    }
+
 	public bool isLure() {
 		return this.lure;
 	}
@@ -730,4 +758,9 @@ class Letter {
 	public bool isTarget() {
 		return this.target;
 	}
+
+    public void SetResponseTime(float rt)
+    {
+        this.responseTime = rt;
+    }
 }

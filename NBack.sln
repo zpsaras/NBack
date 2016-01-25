@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBack.CSharp", "NBack.CSharp.csproj", "{230A219B-C6EE-E3DE-D1F5-74F6484EA29B}"
 EndProject
 Global
