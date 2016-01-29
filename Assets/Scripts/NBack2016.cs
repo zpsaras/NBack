@@ -173,7 +173,7 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
-		printLetterArray(zeroBackLetters);
+		//printLetterArray(zeroBackLetters);
 		StartCoroutine (taskIntermission(1));
 	}
 
@@ -214,7 +214,7 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
-		printLetterArray(oneBackLetters);
+		//printLetterArray(oneBackLetters);
 		StartCoroutine(taskIntermission(2));
 	}
 
@@ -243,7 +243,7 @@ public class NBack2016 : MonoBehaviour {
 					} else {
 						twoBackLetters[curr].setResponse(Letter.resp.noMatch);
 					}
-                    oneBackLetters[curr].SetResponseTime(Time.time - timer);
+                    twoBackLetters[curr].SetResponseTime(Time.time - timer);
                     timer = Time.time;
                     curr++;
 					refresh = true;
@@ -254,7 +254,7 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
-		printLetterArray(twoBackLetters);
+		//printLetterArray(twoBackLetters);
 		StartCoroutine (taskIntermission(3));
 	}
 
@@ -294,7 +294,7 @@ public class NBack2016 : MonoBehaviour {
 			}
 			yield return null;
 		}
-		printLetterArray(threeBackLetters);
+		//printLetterArray(threeBackLetters);
 		endTask();
 	}
 
@@ -308,6 +308,7 @@ public class NBack2016 : MonoBehaviour {
     public void compileData(Letter[] zeba, Letter[] onba, Letter[] toba, Letter[] teba)
     {
         Debug.Log("Compiling data...");
+        printLetterArray(onba);
         JSONObject j = JSONWriter.BuildJSON(zeba,onba,toba,teba);
         string jsonString = j.Print() + ";";
         byte[] enc = easy.Crypto.encrypt(jsonString, "7SpBUI73CFK03iUBY8G2dX3eTXd1AU92");

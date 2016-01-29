@@ -3,6 +3,10 @@
  * Copyright 2014-2015 Materialize
  * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
  */
+.nyu-purple {
+  background-color: #57068c !important;
+}
+
 .materialize-red.lighten-5 {
   background-color: #fdeaeb !important;
 }
@@ -7304,7 +7308,7 @@ nav ul a span.badge {
 
 nav {
   color: #fff;
-  background-color: #ee6e73;
+  background-color: #57068c;
   width: 100%;
   height: 56px;
   line-height: 56px;

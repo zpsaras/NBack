@@ -24,7 +24,7 @@ public class JSONWriter : MonoBehaviour {
         json.AddField("ZeroBack", zeba);
 
         JSONObject onba = new JSONObject(JSONObject.Type.ARRAY);
-        for (i = 0; i < zeroBack.Length; i++)
+        for (i = 0; i < oneBack.Length; i++)
         {
             JSONObject arr = new JSONObject(JSONObject.Type.ARRAY);
             arr.AddField("Character", oneBack[i].getChar().ToString());
@@ -32,12 +32,12 @@ public class JSONWriter : MonoBehaviour {
             arr.AddField("Lure", oneBack[i].isLure().ToString());
             arr.AddField("Response", oneBack[i].getResponse().ToString());
             arr.AddField("ResponseTime", oneBack[i].GetResponseTime().ToString());
-            zeba.AddField(i.ToString(), arr);
+            onba.AddField(i.ToString(), arr);
         }
         json.AddField("OneBack", onba);
 
         JSONObject toba = new JSONObject(JSONObject.Type.ARRAY);
-        for (i = 0; i < zeroBack.Length; i++)
+        for (i = 0; i < twoBack.Length; i++)
         {
             JSONObject arr = new JSONObject(JSONObject.Type.ARRAY);
             arr.AddField("Character", twoBack[i].getChar().ToString());
@@ -45,12 +45,12 @@ public class JSONWriter : MonoBehaviour {
             arr.AddField("Lure", twoBack[i].isLure().ToString());
             arr.AddField("Response", twoBack[i].getResponse().ToString());
             arr.AddField("ResponseTime", twoBack[i].GetResponseTime().ToString());
-            zeba.AddField(i.ToString(), arr);
+            toba.AddField(i.ToString(), arr);
         }
         json.AddField("TwoBack", toba);
 
         JSONObject teba = new JSONObject(JSONObject.Type.ARRAY);
-        for (i = 0; i < zeroBack.Length; i++)
+        for (i = 0; i < threeBack.Length; i++)
         {
             JSONObject arr = new JSONObject(JSONObject.Type.ARRAY);
             arr.AddField("Character", threeBack[i].getChar().ToString());
@@ -58,7 +58,7 @@ public class JSONWriter : MonoBehaviour {
             arr.AddField("Lure", threeBack[i].isLure().ToString());
             arr.AddField("Response", threeBack[i].getResponse().ToString());
             arr.AddField("ResponseTime", threeBack[i].GetResponseTime().ToString());
-            zeba.AddField(i.ToString(), arr);
+            teba.AddField(i.ToString(), arr);
         }
         json.AddField("ThreeBack", teba);
 
